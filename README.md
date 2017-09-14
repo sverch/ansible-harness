@@ -1,7 +1,7 @@
-# AMI Builder
+# Machine Image Build Pipeline
 
-Example of how to use Vagrant, Ansible, Serverspec, and Packer to build an AMI
-with integration tests.
+Example of how to use Vagrant, Ansible, Serverspec, and Packer to build a
+machine image with integration tests.
 
 ## Setup
 
