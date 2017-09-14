@@ -32,4 +32,4 @@ To clean up the instance.
 
 ## Packer Build
 
-TODO
+TODO.  See [packer/README.md](packer/README.md).
