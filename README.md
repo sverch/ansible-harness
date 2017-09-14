@@ -3,6 +3,9 @@
 Example of how to use Vagrant, Ansible, Serverspec, and Packer to build a
 machine image with integration tests.
 
+I used the virtualbox provider behind vagrant to do this, but ec2 could be used
+as well, both for vagrant and for packer.
+
 ## Setup
 
 Install vagrant and run:
