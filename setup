@@ -54,10 +54,16 @@ copy_example () {
     fi
 }
 
+make_symlink () {
+    if [[ ! -e $1 ]]; then
+        ln -s "ansible-harness/$1" "$1"
+    fi
+}
+
 make_shim test
 make_shim install
 make_shim package
-ln -s ansible-harness/Vagrantfile Vagrantfile
+make_symlink Vagrantfile
 copy_example serverspec
 copy_example roles
 copy_example playbook.yml
