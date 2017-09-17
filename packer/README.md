@@ -8,3 +8,6 @@ not as simple as it sounded.  See:
 - https://github.com/hashicorp/packer/issues/869
 
 Building an AMI should have better support.
+
+I should also run serverspec as part of the AMI build:
+https://github.com/garethr/packer-serverspec-example.
