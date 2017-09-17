@@ -12,6 +12,8 @@ git submodule add https://github.com/sverch/ansible-harness
 ansible-harness/setup
 ```
 
+It will install all the following scripts into your Ansible project.
+
 ## Test
 
 ```
