@@ -1,0 +1,12 @@
+#!/bin/bash
+
+run () {
+    echo "+" "$@" 1>&2
+    "$@"
+}
+
+# TODO: Install ansible, so this is completely self contained.
+# TODO: Do not prompt for a password by default
+
+echo "Running the ansible playbook in local mode..."
+run ansible-playbook -i "localhost," -c local playbook.yml -K

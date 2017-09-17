@@ -1,0 +1,64 @@
+#!/bin/bash
+
+set -euo pipefail
+
+run () {
+    echo "+" "$@" 1>&2
+    "$@"
+}
+
+EXPECTED_ARGS=0
+E_BADARGS=65
+
+usage () {
+    echo "Usage: $0"
+    echo "  Must be run from the root of your git repository"
+    echo "  and with ansible-harness cloned as a submodule"
+}
+
+if [ $# -ne $EXPECTED_ARGS ]; then
+    usage
+    exit $E_BADARGS
+fi
+
+if ! git status &> /dev/null; then
+    echo "Must run from a git repostory" 1>&2
+    usage
+    exit 1
+fi
+
+if [[ ! -e .git ]]; then
+    echo "Must run from the root of your git repostory" 1>&2
+    usage
+    exit 1
+fi
+
+if [[ ! -e ansible-harness ]]; then
+    echo "Must run from directory above ansible-harness" 1>&2
+    usage
+    exit 1
+fi
+
+make_shim () {
+    cat <<EOF >| "$1"
+#!/bin/bash
+git submodule init
+ansible-harness/$1 "\$@"
+EOF
+    chmod a+x "$1"
+}
+
+copy_example () {
+    if [[ ! -e $1 ]]; then
+        cp -r "ansible-harness/$1" "$1"
+    fi
+}
+
+make_shim test
+make_shim install
+make_shim package
+ln -s ansible-harness/Vagrantfile Vagrantfile
+copy_example serverspec
+copy_example roles
+copy_example playbook.yml
+copy_example packer

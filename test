@@ -1,0 +1,72 @@
+#!/bin/bash
+
+set -euo pipefail
+
+run () {
+    echo "+ ""$@" 1>&2
+    "$@"
+}
+
+usage () {
+    echo "Usage: $0 [create|configure|validate|destroy|all]"
+}
+
+if [[ $# -lt 1 ]]; then
+    usage
+    exit 1
+fi
+
+PROVIDER=virtualbox
+COMMAND=$1
+
+create () {
+    run vagrant up --provider $PROVIDER --no-provision
+}
+
+configure () {
+    run vagrant provision --provision-with ansible_local
+}
+
+validate () {
+    run vagrant provision --provision-with serverspec
+}
+
+destroy () {
+    run vagrant destroy -f
+}
+
+all () {
+    run create
+    run configure
+    run validate
+    run destroy
+}
+
+if ! vagrant plugin list | grep vagrant-serverspec > /dev/null; then
+    echo "Installing test dependencies..."
+    # https://github.com/vvchik/vagrant-serverspec
+    vagrant plugin install vagrant-serverspec
+fi
+
+case $COMMAND in
+    create)
+        create
+        ;;
+    configure)
+        configure
+        ;;
+    validate)
+        validate
+        ;;
+    destroy)
+        destroy
+        ;;
+    all)
+        all
+        ;;
+*)
+  echo "Unrecognized command: $COMMAND"
+  usage
+  exit 1
+  ;;
+esac

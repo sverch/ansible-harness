@@ -1,38 +1,43 @@
-# Machine Image Build Pipeline
+# Ansible Harness
 
-Example of how to use Vagrant, Ansible, Serverspec, and Packer to build a
-machine image with integration tests.
+Library to abstract away the end to end lifecycle of an instance configured
+using Ansible.
 
-I used the virtualbox provider behind vagrant to do this, but ec2 could be used
-as well, both for vagrant and for packer.
+## Get Started
 
-## Setup
-
-Install vagrant and run:
+From the root of your project, run:
 
 ```
-./setup.sh
+git submodule add https://github.com/sverch/ansible-harness
+ansible-harness/setup
 ```
-
-This will install the prerequisites, vagrant should be the only dependency as
-ansible is configured to run in local mode on the remote machine.
 
 ## Test
 
-To create an instance and run the tests, run:
-
 ```
-vagrant up
+./test all virtualbox
 ```
 
-When you're done, run:
+The `test` script drives the test lifecycle.  It can create an instance,
+provision it using Ansible, and validate it using Serverspec.  Look in the
+`serverspec` directory in your project for the test skeleton.
+
+## Package
 
 ```
-vagrant destroy
+./package ami
 ```
 
-To clean up the instance.
+The `package` script handles building artifacts.  For example, it can provision
+an instance, run your Ansible scripts, and save it as an AMI.  This is driven by
+`packer`.
 
-## Packer Build
+## Install
 
-TODO.  See [packer/README.md](packer/README.md).
+```
+./install local
+```
+
+This script will run the configuration on the local machine.  This is useful,
+for example, in cloud-init scripts if you would like to run your playbook at
+deploy time.
