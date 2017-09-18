@@ -24,14 +24,14 @@ The `test` script drives the test lifecycle.  It can create an instance,
 provision it using Ansible, and validate it using Serverspec.  Look in the
 `serverspec` directory in your project for the test skeleton.
 
-## Package
+## Build
 
 ```
-./package ami
+./build ami
 ```
 
-The `package` script handles building artifacts.  For example, it can provision
-an instance, run your Ansible scripts, and save it as an AMI.  This is driven by
+The `build` script handles building artifacts.  For example, it can provision an
+instance, run your Ansible scripts, and save it as an AMI.  This is driven by
 `packer`.
 
 ## Install

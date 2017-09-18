@@ -63,7 +63,7 @@ make_symlink () {
 
 make_shim test
 make_shim install
-make_shim package
+make_shim build
 make_symlink Vagrantfile
 copy_example serverspec
 copy_example roles
