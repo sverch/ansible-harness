@@ -1,0 +1,42 @@
+#!/bin/bash
+
+set -euo pipefail
+
+run () {
+    echo "+" "$@" 1>&2
+    "$@"
+}
+
+usage () {
+    cat <<EOF
+Usage: $0 <ami>
+
+  Builds the artifact specified using "./playbook.yml" as the configuration.
+
+  This is not yet implemented, but the first supported artifact will be an AMI.
+
+EOF
+}
+
+if [[ $# -lt 1 ]]; then
+    usage
+    exit 1
+fi
+
+PACKAGE=$1
+
+ami () {
+    echo "ami packaging not yet implemented"
+    exit 1
+}
+
+case $PACKAGE in
+    ami)
+        ami
+        ;;
+    *)
+        echo "Unrecognized package type: $PACKAGE"
+        usage
+        exit 1
+        ;;
+esac

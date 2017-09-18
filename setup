@@ -40,23 +40,24 @@ if [[ ! -e ansible-harness ]]; then
 fi
 
 make_shim () {
+    echo "Creating $1 shim"
     cat <<EOF >| "$1"
 #!/bin/bash
 git submodule init
 ansible-harness/$1 "\$@"
 EOF
-    chmod a+x "$1"
+    run chmod a+x "$1"
 }
 
 copy_example () {
     if [[ ! -e $1 ]]; then
-        cp -r "ansible-harness/$1" "$1"
+        run cp -r "ansible-harness/$1" "$1"
     fi
 }
 
 make_symlink () {
     if [[ ! -e $1 ]]; then
-        ln -s "ansible-harness/$1" "$1"
+        run ln -s "ansible-harness/$1" "$1"
     fi
 }
 

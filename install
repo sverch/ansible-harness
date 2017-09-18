@@ -5,8 +5,46 @@ run () {
     "$@"
 }
 
-# TODO: Install ansible, so this is completely self contained.
-# TODO: Do not prompt for a password by default
+usage () {
+    cat <<EOF
+Usage: $0
+
+  Runs the Ansible configuration in "./playbook.yml" in Ansible local mode to
+  install it on the current machine.
+
+  This is useful, for example, if you want to run these Ansible scripts at
+  deploy time in a cloud-init script without having to include any Ansible
+  specific logic in it.
+
+EOF
+}
+
+if [[ $# -ne 0 ]]; then
+    usage
+    exit 1
+fi
+
+install_package () {
+    if which dnf &> /dev/null; then
+        run sudo dnf install "$1"
+    elif which dnf &> /dev/null; then
+        run sudo yum install "$1"
+    elif which apt-get &> /dev/null; then
+        run sudo apt-get "$1"
+    else
+        echo "Can't install $PACKAGE.  No installation command found."
+        exit 1
+    fi
+}
+
+echo "Checking if ansible is installed..."
+if ! which ansible &> /dev/null; then
+    echo "Installing ansible..."
+    install_package ansible
+fi
+
+echo "Running sudo before ansible in case we have a password prompt..."
+sudo test
 
 echo "Running the ansible playbook in local mode..."
-run ansible-playbook -i "localhost," -c local playbook.yml -K
+run ansible-playbook -i "localhost," -c local playbook.yml

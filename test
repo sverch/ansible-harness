@@ -3,12 +3,28 @@
 set -euo pipefail
 
 run () {
-    echo "+ ""$@" 1>&2
+    echo "+" "$@" 1>&2
     "$@"
 }
 
 usage () {
-    echo "Usage: $0 [create|configure|validate|destroy|all]"
+    cat <<EOF
+Usage: $0 <create|configure|validate|destroy|all-stages> [provider]
+
+  Runner script for all the stages necessary to test an Ansible playbook.
+
+    create:     spins up a VM using [provider] (default virtualbox)
+    configure:  runs ansible in local mode on the VM using ./playbook.yml
+    validate:   runs serverspec tests in ./serverspec against the VM
+    destroy:    destroys the VM
+    all-stages: runs all the previous stages in sequence
+
+  Behind the scenes this is a vagrant box, so you should be able to log in using
+  "vagrant ssh" if there is an issue.
+
+  Currently, the only supported provider is virtualbox.
+
+EOF
 }
 
 if [[ $# -lt 1 ]]; then
@@ -16,11 +32,11 @@ if [[ $# -lt 1 ]]; then
     exit 1
 fi
 
-PROVIDER=virtualbox
+PROVIDER=${2:-virtualbox}
 COMMAND=$1
 
 create () {
-    run vagrant up --provider $PROVIDER --no-provision
+    run vagrant up --provider "$PROVIDER" --no-provision
 }
 
 configure () {
@@ -35,7 +51,7 @@ destroy () {
     run vagrant destroy -f
 }
 
-all () {
+all-stages () {
     run create
     run configure
     run validate
@@ -47,6 +63,16 @@ if ! vagrant plugin list | grep vagrant-serverspec > /dev/null; then
     # https://github.com/vvchik/vagrant-serverspec
     vagrant plugin install vagrant-serverspec
 fi
+
+case $PROVIDER in
+    virtualbox)
+        ;;
+    *)
+        echo "Unrecognized provider: $PROVIDER"
+        usage
+        exit 1
+        ;;
+esac
 
 case $COMMAND in
     create)
@@ -61,12 +87,12 @@ case $COMMAND in
     destroy)
         destroy
         ;;
-    all)
-        all
+    all-stages)
+        all-stages
         ;;
-*)
-  echo "Unrecognized command: $COMMAND"
-  usage
-  exit 1
-  ;;
+    *)
+        echo "Unrecognized command: $COMMAND"
+        usage
+        exit 1
+        ;;
 esac

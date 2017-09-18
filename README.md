@@ -17,7 +17,7 @@ This will install all the following scripts into your Ansible project.
 ## Test
 
 ```
-./test all virtualbox
+./test all-stages virtualbox
 ```
 
 The `test` script drives the test lifecycle.  It can create an instance,
@@ -37,7 +37,7 @@ an instance, run your Ansible scripts, and save it as an AMI.  This is driven by
 ## Install
 
 ```
-./install local
+./install
 ```
 
 This script will run the configuration on the local machine.  This is useful,
