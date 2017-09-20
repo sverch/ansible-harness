@@ -48,7 +48,11 @@ validate () {
 }
 
 destroy () {
-    run vagrant destroy -f
+    if vagrant status | grep "not created" > /dev/null; then
+        echo "Vagrant box not created, not running destroy" 1>&2
+    else
+        run vagrant destroy -f
+    fi
 }
 
 full-cycle () {
