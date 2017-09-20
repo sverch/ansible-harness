@@ -27,7 +27,7 @@ This will install all the following scripts into your Ansible project.
 ## Test
 
 ```
-./test all-stages virtualbox
+./test full-cycle virtualbox
 ```
 
 The `test` script drives the test lifecycle.  It can create an instance,
