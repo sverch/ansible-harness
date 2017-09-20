@@ -1,7 +1,8 @@
 # Ansible Harness
 
 Library to abstract away the end to end lifecycle of an instance configured
-using Ansible.
+using Ansible.  The user experience for this is modeled after [Test
+Kitchen](https://github.com/test-kitchen/test-kitchen).
 
 ## Dependencies
 
