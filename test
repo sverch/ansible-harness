@@ -9,7 +9,7 @@ run () {
 
 usage () {
     cat <<EOF
-Usage: $0 <create|configure|validate|destroy|all-stages> [provider]
+Usage: $0 <create|configure|validate|destroy|full-cycle> [provider]
 
   Runner script for all the stages necessary to test an Ansible playbook.
 
@@ -17,7 +17,7 @@ Usage: $0 <create|configure|validate|destroy|all-stages> [provider]
     configure:  runs ansible in local mode on the VM using ./playbook.yml
     validate:   runs serverspec tests in ./serverspec against the VM
     destroy:    destroys the VM
-    all-stages: runs all the previous stages in sequence
+    full-cycle: Run destroy, create, configure, validate, and destroy in sequence
 
   Behind the scenes this is a vagrant box, so you should be able to log in using
   "vagrant ssh" if there is an issue.
@@ -51,7 +51,8 @@ destroy () {
     run vagrant destroy -f
 }
 
-all-stages () {
+full-cycle () {
+    run destroy
     run create
     run configure
     run validate
@@ -87,8 +88,8 @@ case $COMMAND in
     destroy)
         destroy
         ;;
-    all-stages)
-        all-stages
+    full-cycle)
+        full-cycle
         ;;
     *)
         echo "Unrecognized command: $COMMAND"
