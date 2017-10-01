@@ -67,5 +67,6 @@ make_shim build
 make_symlink Vagrantfile
 copy_example serverspec
 copy_example roles
+copy_example requirements.yml
 copy_example playbook.yml
 copy_example packer

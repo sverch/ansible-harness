@@ -1,0 +1,6 @@
+# http://docs.ansible.com/ansible/latest/galaxy.html#installing-multiple-roles-from-a-file
+
+# Install role from GitHub, overriding the name and specifying a specific tag
+- src: https://github.com/geerlingguy/ansible-role-nginx
+  version: master
+  name: nginx_role

@@ -14,10 +14,11 @@ Usage: $0 <create|configure|validate|destroy|full-cycle> [provider]
   Runner script for all the stages necessary to test an Ansible playbook.
 
     create:     spins up a VM using [provider] (default virtualbox)
+    update:     refresh the local Ansible roles from ./requirements.yml
     configure:  runs ansible in local mode on the VM using ./playbook.yml
     validate:   runs serverspec tests in ./serverspec against the VM
     destroy:    destroys the VM
-    full-cycle: Run destroy, create, configure, validate, and destroy in sequence
+    full-cycle: destroy, create, update, configure, validate, and destroy
 
   Behind the scenes this is a vagrant box, so you should be able to log in using
   "vagrant ssh" if there is an issue.
@@ -39,6 +40,11 @@ create () {
     run vagrant up --provider "$PROVIDER" --no-provision
 }
 
+update () {
+    run rm -rf roles/*
+    run ansible-galaxy -p roles -r requirements.yml install -v -f
+}
+
 configure () {
     run vagrant provision --provision-with ansible_local
 }
@@ -58,6 +64,7 @@ destroy () {
 full-cycle () {
     run destroy
     run create
+    run update
     run configure
     run validate
     run destroy
@@ -82,6 +89,9 @@ esac
 case $COMMAND in
     create)
         create
+        ;;
+    update)
+        update
         ;;
     configure)
         configure
