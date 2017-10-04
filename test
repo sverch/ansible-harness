@@ -36,7 +36,31 @@ fi
 PROVIDER=${2:-virtualbox}
 COMMAND=$1
 
+# TODO: Dynamically discover these, and pass them to vagrant in a better way.
+# See:
+# https://stackoverflow.com/questions/14124234/how-to-pass-parameter-on-vagrant-up-and-have-it-in-the-scope-of-vagrantfile#14124316
+export ANSIBLE_HARNESS_AMI="${ANSIBLE_HARNESS_AMI:-ami-d651b8ac}"
+export ANSIBLE_HARNESS_SUBNET_ID="${ANSIBLE_HARNESS_SUBNET_ID:-subnet-419ca21b}"
+export ANSIBLE_HARNESS_SECURITY_GROUP="${ANSIBLE_HARNESS_SECURITY_GROUP:-sg-6aa38c19}"
+
 create () {
+    case $PROVIDER in
+        virtualbox)
+            ;;
+        aws)
+            if ! vagrant box list | grep vagrant-aws-dummy-placeholder > /dev/null; then
+                run vagrant box add vagrant-aws-dummy-placeholder https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box
+            fi
+            if ! aws ec2 describe-key-pairs --query "KeyPairs[*].KeyName" --output text | grep ansible-harness-test-key > /dev/null; then
+                run aws ec2 import-key-pair --key-name ansible-harness-test-key --public-key-material file://./.ssh-test-key/id_rsa.pub
+            fi
+            ;;
+        *)
+            echo "Unrecognized provider: $PROVIDER"
+            usage
+            exit 1
+            ;;
+    esac
     run vagrant up --provider "$PROVIDER" --no-provision
 }
 
@@ -70,21 +94,16 @@ full-cycle () {
     run destroy
 }
 
-if ! vagrant plugin list | grep vagrant-serverspec > /dev/null; then
-    echo "Installing test dependencies..."
-    # https://github.com/vvchik/vagrant-serverspec
-    vagrant plugin install vagrant-serverspec
-fi
+install_plugin () {
+    if ! vagrant plugin list | grep "$1" > /dev/null; then
+        run vagrant plugin install "$1"
+    fi
+}
 
-case $PROVIDER in
-    virtualbox)
-        ;;
-    *)
-        echo "Unrecognized provider: $PROVIDER"
-        usage
-        exit 1
-        ;;
-esac
+# https://github.com/vvchik/vagrant-serverspec
+install_plugin vagrant-serverspec
+# https://github.com/mitchellh/vagrant-aws
+install_plugin vagrant-aws
 
 case $COMMAND in
     create)

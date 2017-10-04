@@ -19,6 +19,25 @@ Vagrant.configure(2) do |config|
     v.cpus = 4
   end
 
+  config.vm.provider "aws" do |aws, override|
+    override.vm.box = "vagrant-aws-dummy-placeholder"
+    aws.keypair_name = "ansible-harness-test-key"
+    aws.associate_public_ip = "true"
+    override.ssh.username = "ubuntu"
+    override.ssh.private_key_path = ".ssh-test-key/id_rsa"
+
+    aws.instance_type = "t2.micro"
+
+    # https://stackoverflow.com/questions/14124234/how-to-pass-parameter-on-vagrant-up-and-have-it-in-the-scope-of-vagrantfile#14124316
+    aws.ami = ENV.fetch("ANSIBLE_HARNESS_AMI")
+    aws.subnet_id = ENV.fetch("ANSIBLE_HARNESS_SUBNET_ID")
+    aws.security_groups = [ENV.fetch("ANSIBLE_HARNESS_SECURITY_GROUP")]
+
+    aws.tags = {
+	  'Name' => 'ansible-harness-test-instance'
+    }
+  end
+
   # Run Ansible from the Vagrant VM
   config.vm.provision "ansible_local" do |ansible|
     ansible.playbook = "playbook.yml"
