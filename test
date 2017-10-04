@@ -36,12 +36,23 @@ fi
 PROVIDER=${2:-virtualbox}
 COMMAND=$1
 
-# TODO: Dynamically discover these, and pass them to vagrant in a better way.
+export ANSIBLE_HARNESS_ENVIRONMENT="${ANSIBLE_HARNESS_ENVIRONMENT:-testenv}"
+
 # See:
 # https://stackoverflow.com/questions/14124234/how-to-pass-parameter-on-vagrant-up-and-have-it-in-the-scope-of-vagrantfile#14124316
+ANSIBLE_HARNESS_SUBNET_ID="$(aws ec2 describe-subnets \
+                             --filters "Name=tag:environment,Values=$ANSIBLE_HARNESS_ENVIRONMENT" \
+                             --query "Subnets[*].SubnetId" \
+                             --output text | cut -f 1)"
+ANSIBLE_HARNESS_SECURITY_GROUP="$(aws ec2 describe-security-groups \
+                                  --query "SecurityGroups[*].GroupId" \
+                                  --filters "Name=tag:environment,Values=$ANSIBLE_HARNESS_ENVIRONMENT" \
+                                  --output text | cut -f 1)"
+export ANSIBLE_HARNESS_SUBNET_ID
+export ANSIBLE_HARNESS_SECURITY_GROUP
+
+# TODO: Dynamically discover this
 export ANSIBLE_HARNESS_AMI="${ANSIBLE_HARNESS_AMI:-ami-d651b8ac}"
-export ANSIBLE_HARNESS_SUBNET_ID="${ANSIBLE_HARNESS_SUBNET_ID:-subnet-419ca21b}"
-export ANSIBLE_HARNESS_SECURITY_GROUP="${ANSIBLE_HARNESS_SECURITY_GROUP:-sg-6aa38c19}"
 
 create () {
     case $PROVIDER in
