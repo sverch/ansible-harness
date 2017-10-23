@@ -13,7 +13,18 @@ Usage: $0 <ami>
 
   Builds the artifact specified using "./playbook.yml" as the configuration.
 
-  This is not yet implemented, but the first supported artifact will be an AMI.
+  This currently can only build EBS based AMIs.  It will spin up an instance,
+  configure it using ansible, and save it as an AMI.  You must have your AWS
+  credentials properly configured to use this.
+
+  Environment variables:
+
+    ANSIBLE_HARNESS_ENVIRONMENT - Name of environment test are being run in.
+                                  Default: testenv.
+    ANSIBLE_HARNESS_SUBNET_ID - Subnet to deploy the test instance in.
+                                Default is to discover based on environment name
+                                and "environment" tag.
+    ANSIBLE_HARNESS_AMI - AMI to use as the starting image when running tests.
 
 EOF
 }
@@ -25,8 +36,20 @@ fi
 
 PACKAGE=$1
 
+export ANSIBLE_HARNESS_ENVIRONMENT="${ANSIBLE_HARNESS_ENVIRONMENT:-testenv}"
+
+ANSIBLE_HARNESS_SUBNET_ID="$(aws ec2 describe-subnets \
+                             --filters "Name=tag:environment,Values=$ANSIBLE_HARNESS_ENVIRONMENT" \
+                             --query "Subnets[*].SubnetId" \
+                             --output text | cut -f 1)"
+export ANSIBLE_HARNESS_SUBNET_ID
+
+# TODO: Dynamically discover this
+export ANSIBLE_HARNESS_AMI="${ANSIBLE_HARNESS_AMI:-ami-d651b8ac}"
+
 ami () {
-    echo "ami packaging not yet implemented"
+    run packer validate packer/template.json
+    run packer build packer/template.json
     exit 1
 }
 

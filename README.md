@@ -9,9 +9,10 @@ Kitchen](https://github.com/test-kitchen/test-kitchen).
 First, install vagrant.  If you are using the virtualbox backend, you need to
 install VirtualBox.
 
-Serverspec is automatically installed by the `test` script as a vagrant plugin,
-and Ansible is installed on the target machine so you don't need to install it
-locally.
+Then, install Ansible.  This is used to configure the machines both in the test
+and the build.
+
+Serverspec is automatically installed by the `test` script as a vagrant plugin.
 
 ## Get Started
 

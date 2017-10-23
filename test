@@ -15,7 +15,7 @@ Usage: $0 <create|configure|validate|destroy|full-cycle> [provider]
 
     create:     spins up a VM using [provider] (default virtualbox)
     update:     refresh the local Ansible roles from ./requirements.yml
-    configure:  runs ansible in local mode on the VM using ./playbook.yml
+    configure:  runs ansible to configure the VM using ./playbook.yml
     validate:   runs serverspec tests in ./serverspec against the VM
     destroy:    destroys the VM
     full-cycle: destroy, create, update, configure, validate, and destroy
@@ -23,7 +23,19 @@ Usage: $0 <create|configure|validate|destroy|full-cycle> [provider]
   Behind the scenes this is a vagrant box, so you should be able to log in using
   "vagrant ssh" if there is an issue.
 
-  Currently, the only supported provider is virtualbox.
+  The currently supported providers are virtualbox and aws.
+
+  Environment variables:
+
+    ANSIBLE_HARNESS_ENVIRONMENT - Name of environment test are being run in.
+                                  Default: testenv.
+    ANSIBLE_HARNESS_SUBNET_ID - Subnet to deploy the test instance in.
+                                Default is to discover based on environment name
+                                and "environment" tag.
+    ANSIBLE_HARNESS_SECURITY_GROUP -  Security group to attach to test instance.
+                                      Default is to discover based on
+                                      environment name and "environment" tag.
+    ANSIBLE_HARNESS_AMI - AMI to use as the starting image when running tests.
 
 EOF
 }
@@ -81,7 +93,7 @@ update () {
 }
 
 configure () {
-    run vagrant provision --provision-with ansible_local
+    run vagrant provision --provision-with ansible
 }
 
 validate () {

@@ -65,8 +65,9 @@ make_shim test
 make_shim install
 make_shim build
 make_symlink Vagrantfile
+make_symlink packer
 copy_example serverspec
 copy_example roles
 copy_example requirements.yml
 copy_example playbook.yml
-copy_example packer
+copy_example bootstrap.sh
