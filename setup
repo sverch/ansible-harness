@@ -12,8 +12,7 @@ E_BADARGS=65
 
 usage () {
     echo "Usage: $0"
-    echo "  Must be run from the root of your git repository"
-    echo "  and with ansible-harness cloned as a submodule"
+    echo "  Must be run from the directory above this checkout"
 }
 
 if [ $# -ne $EXPECTED_ARGS ]; then
@@ -21,33 +20,11 @@ if [ $# -ne $EXPECTED_ARGS ]; then
     exit $E_BADARGS
 fi
 
-if ! git status &> /dev/null; then
-    echo "Must run from a git repostory" 1>&2
-    usage
-    exit 1
-fi
-
-if [[ ! -e .git ]]; then
-    echo "Must run from the root of your git repostory" 1>&2
-    usage
-    exit 1
-fi
-
 if [[ ! -e ansible-harness ]]; then
     echo "Must run from directory above ansible-harness" 1>&2
     usage
     exit 1
 fi
-
-make_shim () {
-    echo "Creating $1 shim"
-    cat <<EOF >| "$1"
-#!/bin/bash
-git submodule init
-ansible-harness/$1 "\$@"
-EOF
-    run chmod a+x "$1"
-}
 
 copy_example () {
     if [[ ! -e $1 ]]; then
@@ -61,10 +38,11 @@ make_symlink () {
     fi
 }
 
-make_shim test
-make_shim install
-make_shim build
-make_symlink Vagrantfile
+make_symlink .gitignore
+make_symlink amifind.sh
+make_symlink Rakefile
+make_symlink Gemfile
+make_symlink install-packer-serverspec-plugin.sh
 make_symlink packer
 copy_example serverspec
 copy_example roles
