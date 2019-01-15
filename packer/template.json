@@ -1,8 +1,8 @@
 {
   "variables": {
-    "ami_id": "{{env `ANSIBLE_HARNESS_AMI`}}",
-    "environment_name": "{{env `ANSIBLE_HARNESS_ENVIRONMENT`}}",
-    "subnet_id": "{{env `ANSIBLE_HARNESS_SUBNET_ID`}}"
+    "ami_id": "",
+    "ami_type": "",
+    "subnet_id": ""
   },
   "builders": [
     {
@@ -11,7 +11,7 @@
       "source_ami": "{{user `ami_id`}}",
       "instance_type": "t2.micro",
       "ssh_username": "ubuntu",
-      "ami_name": "packer {{user `environment_name`}} {{timestamp}}",
+      "ami_name": "packer {{user `ami_type`}} {{timestamp}}",
       "associate_public_ip_address": true,
       "subnet_id": "{{user `subnet_id`}}"
     }
@@ -25,6 +25,12 @@
     {
       "type": "ansible",
       "playbook_file": "{{template_dir}}/../playbook.yml"
+    },
+    {
+      "type": "serverspec",
+      "rake_file": "Rakefile",
+      "rake_task": "serverspec:all",
+      "rake_env_vars": "$BUNDLE_GEMFILE=Gemfile"
     }
   ]
 }

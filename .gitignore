@@ -1,3 +1,6 @@
 .vagrant
 *.retry
 roles/*
+vars.json
+packer-provisioner-serverspec
+Gemfile.lock
