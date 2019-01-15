@@ -32,7 +32,7 @@ bundle install
 
 Then install your ansible roles:
 
-``
+```
 ansible-galaxy install -r requirements.yml -p roles
 ```
 
